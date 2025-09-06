@@ -748,7 +748,7 @@ end
 
 ---Walks all active quests and completes any that are availble
 ---@param onlyProcessFirst boolean If true, only claims the first available and returns the name of it; else does all and returns nil
----@return string? Name of completed quest, if param is true, else nil 
+---@return string? Name of completed quest, if param is true, else nil
 function EnumerateActiveQuests(onlyProcessFirst)
 	local currentNode = nil
 	local nextNode = nil
@@ -1136,7 +1136,7 @@ end
 -- Items are the sub-informationals on the right (i.e. "All of the options for this reward include:....")
 local function reward_select_item(reward_index, option_index, item_index)
 	mqutils.cmdf('/notify RewardSelectionWnd RewardSelectionItemList listselect %s', item_index)
-	mq.delay(1000, function() return mq.TLO.Rewards.Reward(reward_index).Option(option_index).Item(item_index).Selected() ~= nil end)
+	mq.delay(1000, function() return mq.TLO.Window('RewardSelectionWnd/RewardSelectionItemList').GetCurSel() == item_index end)
 end
 
 function ParseRewardExpFromReward(index, rewardItem)
@@ -1182,7 +1182,7 @@ function LoadAvailableQuestsExtraData(quest_name)
 
 	local rewardDescription = mq.TLO.Window('RewardSelectionWnd/RewardPageTabWindow').Tab(questName).Child('RewardSelectionDescriptionArea').Text()
 	local experience, mercenaryAas = rewardDescription:match("([^%%]*)%%[a-zA-Z0-9 ]* and ([0-9.]*)")
-	
+
 	-- Two possible descriptions of Merc AA's.  One for < 1%, other >= 1%.
 	if (string_utils.ends_with(rewardDescription, "t.") == true) then
 		local exp = tonumber(mercenaryAas);
@@ -1757,7 +1757,7 @@ function SelectNextDuplicateAgent(priority)
 		amount = string.sub(NODE.Child('OW_OQP_MinionCountLabel').Text(), 2)
 
 		local minionName = minionButton.Text()
-		if (tonumber(amount) > agentCountForConversion) then
+		if (tonumber(amount) and tonumber(amount) > agentCountForConversion) then
 			local result2 = FailedQuest_IsExcludedAgent(minionName)
 			if (result2) then
 				logger.info('...ignoring excluded agent \ay%s', minionName)
@@ -1899,7 +1899,7 @@ function EnumerateAvailableQuests(determineMethod, runQuestMethod, rarity, durat
 	local currentIndex = 0
 	::getNext::
 	if (AreAtMaxQuests() == true) then return false end
-	
+
 	currentIndex = currentIndex + 1
 	if (currentIndex > AvailableQuestCount) then
 		return true
