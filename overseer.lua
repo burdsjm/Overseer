@@ -1735,6 +1735,8 @@ function ProcessConversionQuest(priority)
 end
 
 function SelectNextDuplicateAgent(priority)
+	-- Wait for UI to load
+	mq.delay(500)
 	local amount
 	local agentCountForConversion = 2
 
@@ -1748,13 +1750,37 @@ function SelectNextDuplicateAgent(priority)
 	end
 
 	local NODE = mq.TLO.Window(MinionSelectionScreenFirstMinion).FirstChild
-	if (NODE.Siblings() == false) then return false end
+	if (NODE == nil or NODE.Siblings() == false) then return false end
 	NODE = NODE.Next
 
 	::nextAgent::
+	-- Add nil checks here
+	if (NODE == nil or tostring(NODE) == "NULL") then
+		logger.error("SelectNextDuplicateAgent: NODE is nil, returning false")
+		return false
+	end
+
 	local minionButton = NODE.Child('OW_OQP_MinionNameBtn')
+	if (minionButton == nil or tostring(minionButton) == "NULL") then
+		logger.error("SelectNextDuplicateAgent: minionButton is nil")
+		goto nextAgentOrReturn
+	end
+
 	if (minionButton.Enabled ~= nil and minionButton.Enabled()) then
-		amount = string.sub(NODE.Child('OW_OQP_MinionCountLabel').Text(), 2)
+		-- Add nil check for count label
+		local countLabel = NODE.Child('OW_OQP_MinionCountLabel')
+		if (countLabel == nil or tostring(countLabel) == "NULL" or countLabel.Text == nil) then
+			logger.error("SelectNextDuplicateAgent: count label is nil")
+			goto nextAgentOrReturn
+		end
+
+		amount = string.sub(countLabel.Text(), 2)
+
+		-- Add nil check for minion name
+		if (minionButton.Text == nil) then
+			logger.error("SelectNextDuplicateAgent: minionButton.Text is nil")
+			goto nextAgentOrReturn
+		end
 
 		local minionName = minionButton.Text()
 		if (tonumber(amount) and tonumber(amount) > agentCountForConversion) then
@@ -1769,7 +1795,8 @@ function SelectNextDuplicateAgent(priority)
 		end
 	end
 
-	if (NODE.Siblings()) then
+	::nextAgentOrReturn::
+	if (NODE ~= nil and NODE.Siblings()) then
 		NODE = NODE.Next
 		goto nextAgent
 	end
