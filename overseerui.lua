@@ -477,7 +477,9 @@ local all_rewards = {
     "Claws of Veeshan",
     "Terror of Luclin",
     "Night of Shadows",
-    "Laurion's Song",}
+    "Laurion's Song",
+    "The Outer Brood",
+}
 
 local active_item_current_idx = 0
 local available_item_current_idx = 0
