@@ -390,9 +390,9 @@ function RenderSettingsGeneralTab()
                 ImGui.Indent(20)
                 ImGui.PushItemWidth(100)
                 Settings.General.maxLevelForClaimingExpReward, changed = ImGui.InputInt("Custom Max Level Claim Exp.",
-                    Settings.General.maxLevelForClaimingExpReward, 1, 125, ImGuiInputTextFlags.EnterReturnsTrue)
+                    Settings.General.maxLevelForClaimingExpReward, 130, ImGuiInputTextFlags.EnterReturnsTrue)
                 if Settings.General.maxLevelForClaimingExpReward < 1 then Settings.General.maxLevelForClaimingExpReward = 1 end
-                if Settings.General.maxLevelForClaimingExpReward > 125 then Settings.General.maxLevelForClaimingExpReward = 125 end
+                if Settings.General.maxLevelForClaimingExpReward > 130 then Settings.General.maxLevelForClaimingExpReward = 130 end
                 uiutils.add_tooltip('Max Level To Claim Experience Rewards')
                 if (changed) then settings.SaveSettings() end
                 ImGui.Unindent(20)

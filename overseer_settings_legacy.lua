@@ -232,7 +232,7 @@ function EnsureIniDefaults_VersionUpdates()
 	end
 
 	if (Settings.General.version <= 10) then
-		Settings.General.maxLevelForClaimingExpReward = 125
+		Settings.General.maxLevelForClaimingExpReward = 130
 	end
 
 	if (Settings.General.version <= 9) then
