@@ -20,6 +20,10 @@
 -- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 -- CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+-- NOTE: Vendored argparse.lua (v0.7.1) used for CLI-style parsing in this repo.
+-- Provides chainable builders for arguments/options/commands and shell completions.
+-- Keep local edits minimal; prefer upstream updates when possible.
+
 local function deep_update(t1, t2)
    for k, v in pairs(t2) do
       if type(v) == "table" then
