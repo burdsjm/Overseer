@@ -2,6 +2,7 @@
     // VS Code extension recommendations for this repo.
     // Add repo-specific tooling here (linters, formatters, language servers).
     "recommendations": [
-        "github.copilot-chat"
+        "github.copilot-chat",
+        "oderwat.indent-rainbow"
     ]
 }

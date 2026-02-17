@@ -10,8 +10,15 @@ require('utils.persistence')
 
 local actions = {}
 
-local Version = '3.78'
+local Version = 'Beta 5.0'
 local MyIni = 'Overseer.lua'
+
+-- Settings change callbacks
+local __change_callbacks = {}
+
+function RegisterSettingsChangeCallback(fn)
+    if type(fn) == 'function' then table.insert(__change_callbacks, fn) end
+end
 
 actions.InTestMode = false
 
@@ -37,6 +44,9 @@ SettingsTemp = {}
 
 function actions.SaveSettings()
 	persistence.store(MyIniPath, Settings)
+	for _, cb in ipairs(__change_callbacks) do
+		pcall(cb) -- protect callback errors from breaking SaveSettings
+	end
 end
 
 function ReorderCollectionUp(collection, index)
@@ -209,11 +219,6 @@ end
 local function save_quest_priority_rarities(old, new)
 	if (not old or not new) then return end
 
-	-- if (new.rarities.elite and new.rarities.rare and new.rarities.uncommon and new.rarities.common and new.rarities.easy) then
-	-- 	old.Rarities = "Any"
-	-- 	return
-	-- end
-
 	local isFirst = true
 	old.Rarities = ""
 	old.Rarities, isFirst = concatenate(new.rarities.elite, old.Rarities, "Elite", isFirst)
@@ -228,6 +233,7 @@ local function save_quest_priority_durations(old, new)
 
 	local isFirst = true
 	old.Durations = ""
+	old.Durations, isFirst = concatenate(new.durations.h3, old.Durations, "3h", isFirst)
 	old.Durations, isFirst = concatenate(new.durations.h6, old.Durations, "6h", isFirst)
 	old.Durations, isFirst = concatenate(new.durations.h12, old.Durations, "12h", isFirst)
 	old.Durations, isFirst = concatenate(new.durations.h24, old.Durations, "24h", isFirst)
@@ -309,6 +315,7 @@ local function load_settings_temp_questpriorities_item(legacySectionName, priori
 	if (not old.Durations) then split = nil
 	else split = utils.split(old.Durations, '|')	end
 	new.durations = {
+		h3 = has_item(split, "3h") or has_item(split, "Any"),
 		h6 = has_item(split, "6h") or has_item(split, "Any"),
 		h12 = has_item(split, "12h") or has_item(split, "Any"),
 		h24 = has_item(split, "24h") or has_item(split, "Any"),
@@ -526,15 +533,15 @@ local function ensure_ini_defaults()
 					storedExpRewardsCount = 8,
 					claimRewards = false,
 				},
-				useRandomizedUiInteractionDelays = false,
 				useQuestDatabase = true,
 				minimumSuccessPercent = 0,
-				logLevel = 1,
+				logLevel = 4,
 				ignoreConversionQuests = false,
 				ignoreRecruitmentQuests = false,
 				ignoreRecoveryQuests = true,
 				countAgentsBetweenCycles = false,
 				maxLevelUseCurrentCap = true,
+				---@diagnostic disable-next-line: undefined-field
 				maxLevelForClaimingExpReward = mq.TLO.Me.MaxLevel(),
 				maxLevelPctForClaimingExpReward = 95,
 				claimCollectionFragments = false,
@@ -544,13 +551,14 @@ local function ensure_ini_defaults()
 				agentCountForConversionCommon = 2,
 				agentCountForConversionUncommon = 2,
 				agentCountForConversionRare = 2,
+				agentCountForRetireElite = 99,
 				showUi = true,
 				autoRestartEachCycle = false,
 				runFullCycleOnStartup = false,
 				campAfterFullCycle = false,
 				campAfterFullCycleFastCamp = false,
 				pauseOnCharacterChange = false,
-				convertEliteAgents = false,
+				retireEliteAgents = false,
 				ForceCompletedAchievementQuests = false,
 				uiActions = {
 					useDelay = false,
@@ -559,6 +567,7 @@ local function ensure_ini_defaults()
 				}
 			},
 			Display = {
+				autoFitWindow = true,
 				showDetailed = true,
 			},
 			QuestPriority = {
@@ -608,6 +617,7 @@ local function ensure_ini_defaults()
 						h24 = true,
 						h12 = true,
 						h6 = true,
+						h3 = true,
 					},
 					levels = {
 						level1 = true,
@@ -727,15 +737,19 @@ local function initialize(turn_off_autorun_settings)
 	logger.warning('v. \at%s\ax   Configuration: \at%s\ax', Version, MyIni)
 
 	EnsureIniDefaults_VersionUpdates()
-
-	StopOnMaxMercAA = Settings.General.stopOnMaxMercAA
+	-- sync persisted allowTestMode into runtime flag
+	actions.InTestMode = (Settings.Debug and Settings.Debug.allowTestMode) and true or false
 
 	CountAgentsBetweenCycles = Settings.General.countAgentsBetweenCycles
 
 	DebugNoRunQuestMode = Settings.Debug.doNotRunQuests
 	DebugNoSelectAgents = Settings.Debug.doNotFindAgents
 	mqutils.set_delays(Settings.General.uiActions.useUiActionDelay, Settings.General.uiActions.delayMinMs, Settings.General.uiActions.delayMaxMs)
-
+	Settings.Debug = Settings.Debug or {}
+	Settings.Debug.processFullQuestRewardData = Settings.Debug.processFullQuestRewardData or false
+	Settings.Debug.validateQuestRewardData = Settings.Debug.validateQuestRewardData or false
+	-- NEW: allow updates on validation mismatches when true (default: false)
+	Settings.Debug.updateQuestDatabaseOnValidate = Settings.Debug.updateQuestDatabaseOnValidate or false
 	load_achievement_quests()
 	load_settings_temp()
 

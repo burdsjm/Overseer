@@ -1,4 +1,4 @@
-local overseer = require('overseer.overseer')
+local overseer = require('overseer')
 
 local actions = {}
 

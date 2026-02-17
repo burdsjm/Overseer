@@ -5,10 +5,15 @@
 		}
 	],
 	"settings": {
-		"mq-defs.etag": "W/\"609c81f50081776b14f6a7c1a7dd73d4062bceed0c3c321e33d4a50a80d466de\"",
+		"mq-defs.etag": "W/\"c68d9ebec7c43ee72913c969388e0141ff4a3aa93994cc1f8895dec825b6a47c\"",
 		"Lua.workspace.library": [
 			"c:\\Users\\burdsjm\\AppData\\Roaming\\Code\\User\\globalStorage\\zenithcodeforge.mq-defs\\file-downloader-downloads\\macroquest\\mq-definitions-master",
 			"c:\\Users\\BURDS\\AppData\\Roaming\\Code\\User\\globalStorage\\zenithcodeforge.mq-defs\\file-downloader-downloads\\macroquest\\mq-definitions-master"
+		]
+	},
+	"extensions": {
+		"recommendations": [
+			"oderwat.indent-rainbow"
 		]
 	}
 }
