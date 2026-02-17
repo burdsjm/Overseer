@@ -4,8 +4,6 @@
 
 Overseer automates EverQuest's Overseer system with intelligent quest selection, agent assignment, reward collection, and optional SQLite database tracking. Features a full ImGui interface, multi-level logging, and safe-by-default database operations.
 
-**Author:** Heavily refactored by Cannonballdex  
-**Repository:** [github.com/cannonballdex/Overseer](https://github.com/cannonballdex/Overseer)
 
 ---
 
