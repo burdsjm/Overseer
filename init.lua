@@ -29,12 +29,6 @@ local shared = data_dir .. '/overseer.db'
 local char = mq.TLO.Me.CleanName() or 'unknown'
 local dest = string.format("%s/overseer_%s.db", data_dir, char)
 
-if package.loaded['overseer.database'] then
-    logger.info("package.loaded['overseer.database'] = %s", tostring(package.loaded['overseer.database'] ~= nil))
-else
-    logger.info("overseer.database not loaded yet.")
-end
-
 -- Utility: copy file in chunks (portable)
 local function copy_file(src, dst)
   local inFile = io.open(src, "rb")
@@ -164,8 +158,7 @@ end
 settings.InitializeOverseerSettings(no_run)
 
 do
-  local ok, lvl = pcall(function() return logger.get_log_level() end)
-  local level_str = (ok and lvl) and tostring(lvl) or "unknown"
+  local level_str = tostring(logger.get_log_level())
   local msg = string.format("\ar[\agOverseer.lua\ar]   \atLog level = %s. Change Verbose in Settings/Test-Debug-Logging.", level_str)
   print(msg)
   logger.info("Initialization and Database setup complete.")
