@@ -176,7 +176,7 @@ end
 if not mq.TLO.Plugin("MQ2Rewards").IsLoaded() then
   logger.info("MQ2Rewards not loaded. Loading plugin...")
   mq.cmd("/plugin mq2rewards load")
-  mq.delay(500) -- brief delay to allow plugin to initialize
+  mq.delay(5000, function() return mq.TLO.Plugin("MQ2Rewards").IsLoaded() end)
   if mq.TLO.Plugin("MQ2Rewards").IsLoaded() then
     logger.info("MQ2Rewards plugin loaded successfully.")
   else
