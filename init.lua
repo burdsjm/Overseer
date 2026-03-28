@@ -172,6 +172,20 @@ if Settings and Settings.General and Settings.General.useQuestDatabase == false 
     logger.info('\atYou can \agEnable Database \atGeneral/Settings/Use Quest Database')
 end
 
+-- Autoload MQ2Rewards plugin since it's integral to Overseer functionality
+if not mq.TLO.Plugin("MQ2Rewards").IsLoaded() then
+  logger.info("MQ2Rewards not loaded. Loading plugin...")
+  mq.cmd("/plugin mq2rewards load")
+  mq.delay(500) -- brief delay to allow plugin to initialize
+  if mq.TLO.Plugin("MQ2Rewards").IsLoaded() then
+    logger.info("MQ2Rewards plugin loaded successfully.")
+  else
+    logger.error("MQ2Rewards plugin could not be loaded. Reward collection may not work.")
+  end
+else
+  logger.info("MQ2Rewards plugin already loaded.")
+end
+
 ui.InitializeUi(Settings.General and Settings.General.showUi)
 overseer.Main()
 
