@@ -203,14 +203,14 @@ if not package.loaded['overseer_events_initialized'] then
 end
 
 -- Autoload MQ2Rewards plugin since it's integral to Overseer functionality
-if not mq.TLO.Plugin("MQ2Rewards").IsLoaded() then
+if mq.TLO.Plugin("MQ2Rewards").IsLoaded() == false then
   logger.info("MQ2Rewards not loaded. Loading plugin...")
   mq.cmd("/plugin mq2rewards load")
-  mq.delay(5000, function() return mq.TLO.Plugin("MQ2Rewards").IsLoaded() end)
-  if mq.TLO.Plugin("MQ2Rewards").IsLoaded() then
-    logger.info("MQ2Rewards plugin loaded successfully.")
-  else
+  mq.delay(5000, function() return mq.TLO.Plugin("MQ2Rewards").IsLoaded() ~= false end)
+  if mq.TLO.Plugin("MQ2Rewards").IsLoaded() == false then
     logger.error("MQ2Rewards plugin could not be loaded. Reward collection may not work.")
+  else
+    logger.info("MQ2Rewards plugin loaded successfully.")
   end
 else
   logger.info("MQ2Rewards plugin already loaded.")
