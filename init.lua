@@ -44,6 +44,19 @@ local function copy_file(src, dst)
   return true
 end
 
+-- Autoload MQ2Rewards plugin since it's integral to Overseer functionality
+if mq.TLO.Plugin("MQ2Rewards").IsLoaded() == false then
+  logger.info("MQ2Rewards not loaded. Loading plugin...")
+  mq.cmd("/plugin mq2rewards load")
+  if mq.TLO.Plugin("MQ2Rewards").IsLoaded() == false then
+    logger.error("MQ2Rewards plugin could not be loaded. Reward collection may not work.")
+  else
+    logger.info("MQ2Rewards plugin loaded successfully.")
+  end
+else
+  logger.info("MQ2Rewards plugin already loaded.")
+end
+
 -- Utility: get number of quest rows in a DB file (returns count or nil and an error string)
 local function get_quest_count(dbpath)
   local ok, sdb = pcall(function() return sqlite3.open(dbpath) end)
@@ -200,20 +213,6 @@ if not package.loaded['overseer_events_initialized'] then
 
    -- Mark as initialized so this block won't run again
    package.loaded['overseer_events_initialized'] = true
-end
-
--- Autoload MQ2Rewards plugin since it's integral to Overseer functionality
-if mq.TLO.Plugin("MQ2Rewards").IsLoaded() == false then
-  logger.info("MQ2Rewards not loaded. Loading plugin...")
-  mq.cmd("/plugin mq2rewards load")
-  mq.delay(5000, function() return mq.TLO.Plugin("MQ2Rewards").IsLoaded() ~= false end)
-  if mq.TLO.Plugin("MQ2Rewards").IsLoaded() == false then
-    logger.error("MQ2Rewards plugin could not be loaded. Reward collection may not work.")
-  else
-    logger.info("MQ2Rewards plugin loaded successfully.")
-  end
-else
-  logger.info("MQ2Rewards plugin already loaded.")
 end
 
 while Open do
