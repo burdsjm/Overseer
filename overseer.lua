@@ -135,38 +135,23 @@ function actions.Main()
 		end
 end
 
--- Cancellation helpers (add near top of overseer.lua, after InProcess/Aborting/CurrentProcessName)
-local function should_abort_now()
-    return Aborting == true and AbortingProcessName ~= nil and AbortingProcessName == CurrentProcessName
-end
-
-local function handle_abort_cleanup()
-    logger.info("[INFO] Process '%s' abort acknowledged; performing cleanup", tostring(CurrentProcessName))
-    LastAbortTime = os.time() or 0
-    nextAction = nil
-    Aborting = false
-    AbortingProcessName = nil
-    InProcess = false
-    CurrentProcessName = "Initialze"
-end
-
 -- run_step wraps each top-level step so cancellation is checked before/after and logs progress
 local function run_step(step_fn, step_name)
     if should_abort_now() then
-    logger.info("[INFO] Abort seen during CollectAllRewards for '%s' - stopping", tostring(CurrentProcessName))
-    handle_abort_cleanup()
-    return
-end
+        logger.info("[INFO] Abort seen before '%s' - stopping", tostring(step_name or 'unknown step'))
+        handle_abort_cleanup()
+        return
+    end
     logger.info("[STEP] Starting: %s", tostring(step_name or tostring(step_fn)))
     local ok, err = pcall(step_fn)
     if not ok then
         logger.error("[STEP] Error in %s: %s", tostring(step_name or step_fn), tostring(err))
     end
     if should_abort_now() then
-    logger.info("[INFO] Abort seen during CollectAllRewards for '%s' - stopping", tostring(CurrentProcessName))
-    handle_abort_cleanup()
-    return
-end
+        logger.info("[INFO] Abort seen after '%s' - stopping", tostring(step_name or 'unknown step'))
+        handle_abort_cleanup()
+        return
+    end
     logger.info("[STEP] Finished: %s", tostring(step_name or tostring(step_fn)))
     return true
 end
@@ -233,8 +218,8 @@ end
 
 function handle_abort_cleanup()
     logger.info("[INFO] Process '%s' abort acknowledged; performing cleanup", tostring(CurrentProcessName))
-    -- add any cleanup you need here (close windows, release resources, stop workers)
-    -- clear the abort flags only after the worker actually stopped
+    LastAbortTime = os.time() or 0
+    nextAction = nil
     Aborting = false
     AbortingProcessName = nil
     InProcess = false
