@@ -1,18 +1,10 @@
 -- Overseer init.lua
-local function ensure_package(package_name, require_name)
-    local status, lib = pcall(require, require_name)
-    if status then
-        return lib
-    end
+local mq = require('mq')
+local PackageMan = require('mq/PackageMan')
 
-    local packageMan = require('mq/PackageMan')
-    return packageMan.InstallAndLoad(package_name, require_name)
-end
+local lfs = PackageMan.Require('luafilesystem', 'lfs')
+local sqlite3 = PackageMan.Require('lsqlite3')
 
-ensure_package('luafilesystem', 'lfs')
-ensure_package('lsqlite3', 'lsqlite3')
-
-local sqlite3 = require('lsqlite3')
 --- @type Mq
 local db = require('overseer.database')
 local settings = require ('overseer_settings')
@@ -20,9 +12,7 @@ local overseer = require ('overseer')
 local ui = require ('overseerui')
 local logger = require('utils.logger')
 require ('overseer_settings_commands')
-local lfs = require('lfs')
 local io_utils = require('utils.io_utils')
-local mq = require('mq')
 
 local data_dir = io_utils.get_lua_file_path('data') -- adjust if your utils differ
 local shared = data_dir .. '/overseer.db'
